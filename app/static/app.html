@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>清新多语评论Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --text: #0f172a;
+      }
+      body {
+        font-family: "Noto Sans SC", "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        color: var(--text);
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.78);
+        border: 1px solid rgba(226, 232, 240, 0.75);
+        backdrop-filter: blur(14px);
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen">
+    <div class="fixed inset-0 -z-10 bg-gradient-to-b from-pink-50 via-white to-sky-50"></div>
+    <div class="fixed inset-0 -z-10 opacity-60 bg-[radial-gradient(circle_at_20%_15%,rgba(253,164,175,0.45),transparent_40%),radial-gradient(circle_at_80%_25%,rgba(125,211,252,0.45),transparent_45%),radial-gradient(circle_at_35%_85%,rgba(253,230,138,0.45),transparent_45%)]"></div>
+
+    <div class="max-w-6xl mx-auto px-4 py-6">
+      <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div class="inline-flex items-center gap-3">
+          <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-pink-200 via-fuchsia-100 to-sky-200 border border-white/70 shadow-sm"></div>
+          <div>
+            <h1 class="text-xl font-semibold tracking-tight">清新多语评论Demo</h1>
+            <p class="text-sm text-slate-600">粉嫩清爽 · 自动风控 · 多语种社区氛围一眼懂</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2 items-center">
+          <a class="px-3 py-2 rounded-xl text-sm border bg-white/70 border-slate-200/60 hover:bg-white" href="/docs">API 文档</a>
+        </div>
+      </header>
+
+      <!-- Top analytics -->
+      <section class="mt-5 grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div class="card rounded-3xl p-4 shadow-sm">
+          <div class="text-xs text-slate-600">总评论数</div>
+          <div id="kpiTotal" class="mt-2 text-2xl font-semibold">-</div>
+        </div>
+        <div class="card rounded-3xl p-4 shadow-sm">
+          <div class="text-xs text-slate-600">安全 / 违规 / 警告</div>
+          <div class="mt-2 flex flex-wrap gap-2 text-sm">
+            <span class="px-2 py-1 rounded-full border bg-emerald-50 text-emerald-900 border-emerald-200/70">安全 <b id="kpiSafe">-</b></span>
+            <span class="px-2 py-1 rounded-full border bg-rose-50 text-rose-900 border-rose-200/70">违规 <b id="kpiToxic">-</b></span>
+            <span class="px-2 py-1 rounded-full border bg-amber-50 text-amber-900 border-amber-200/70">警告 <b id="kpiWarn">-</b></span>
+          </div>
+        </div>
+        <div class="card rounded-3xl p-4 shadow-sm md:col-span-2">
+          <div class="text-xs text-slate-600">违规类型分布</div>
+          <div class="mt-2 flex flex-wrap gap-2 text-sm" id="kpiDist">
+            <span class="px-2 py-1 rounded-full border bg-white/70 border-slate-200/70">辱骂 <b id="dInsult">-</b></span>
+            <span class="px-2 py-1 rounded-full border bg-white/70 border-slate-200/70">拉踩 <b id="dCompare">-</b></span>
+            <span class="px-2 py-1 rounded-full border bg-white/70 border-slate-200/70">引战 <b id="dWar">-</b></span>
+            <span class="px-2 py-1 rounded-full border bg-white/70 border-slate-200/70">多语种 <b id="dMulti">-</b></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Behavior analytics (local) -->
+      <section class="mt-3 grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div class="card rounded-3xl p-4 shadow-sm">
+          <div class="text-xs text-slate-600">用户留存率（本机）</div>
+          <div class="mt-2 text-2xl font-semibold"><span id="kpiRetention">-</span><span class="text-sm text-slate-500 ml-1">%</span></div>
+          <div class="mt-1 text-[11px] text-slate-500">按最近 7 天“回访天数/访问天数”估算</div>
+        </div>
+        <div class="card rounded-3xl p-4 shadow-sm">
+          <div class="text-xs text-slate-600">点击率（CTR，本机）</div>
+          <div class="mt-2 text-2xl font-semibold"><span id="kpiCtr">-</span><span class="text-sm text-slate-500 ml-1">%</span></div>
+          <div class="mt-1 text-[11px] text-slate-500">点赞/翻译/回复/助手点击 ÷ 曝光</div>
+        </div>
+        <div class="card rounded-3xl p-4 shadow-sm">
+          <div class="text-xs text-slate-600">浏览率（本机）</div>
+          <div class="mt-2 text-2xl font-semibold"><span id="kpiBrowse">-</span><span class="text-sm text-slate-500 ml-1">%</span></div>
+          <div class="mt-1 text-[11px] text-slate-500">已曝光卡片 ÷ 总卡片（滚动越多越高）</div>
+        </div>
+        <div class="card rounded-3xl p-4 shadow-sm">
+          <div class="text-xs text-slate-600">时段高峰流量（本机）</div>
+          <div id="kpiPeak" class="mt-3 grid grid-cols-12 gap-1 items-end h-14"></div>
+          <div class="mt-1 text-[11px] text-slate-500">按访问时间统计（每根柱=1小时）</div>
+        </div>
+      </section>
+
+      <div class="mt-5 grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <section class="lg:col-span-2 card rounded-3xl shadow-sm">
+          <div class="p-5 border-b border-slate-200/60 flex items-center justify-between gap-3">
+            <div>
+              <h2 class="text-base font-semibold">社区动态</h2>
+              <p class="text-xs text-slate-600 mt-1">打开即有 50 条模拟评论，发言会自动检测风险。</p>
+            </div>
+            <button id="btnRefresh" class="px-3 py-2 rounded-xl text-sm border bg-white/70 border-slate-200/60 hover:bg-white">刷新</button>
+          </div>
+          <div id="feed" class="p-5 space-y-3"></div>
+        </section>
+
+        <aside class="space-y-4">
+          <div class="card rounded-3xl shadow-sm p-5">
+            <h2 class="text-base font-semibold">发一条</h2>
+            <p class="text-xs text-slate-600 mt-1">所有人都是游客身份，不需要登录。</p>
+            <div class="mt-4 space-y-3">
+              <label class="block">
+                <div class="text-xs text-slate-600 mb-1">昵称</div>
+                <input id="nickname" class="w-full rounded-2xl border border-slate-200/70 bg-white/70 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-pink-200" placeholder="比如：星星爱好者" />
+              </label>
+              <label class="block">
+                <div class="text-xs text-slate-600 mb-1">内容</div>
+                <textarea id="content" rows="4" class="w-full rounded-2xl border border-slate-200/70 bg-white/70 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-pink-200" placeholder="想说什么都行～（违规内容会被标红）"></textarea>
+              </label>
+              <button id="btnPost" class="w-full rounded-2xl px-3 py-2 text-sm font-medium text-slate-900 bg-gradient-to-r from-pink-200 via-fuchsia-100 to-sky-200 border border-white/70 hover:brightness-[1.02] active:translate-y-px">发布</button>
+              <p id="postMsg" class="text-xs text-slate-600"></p>
+            </div>
+          </div>
+
+          <div class="card rounded-3xl shadow-sm p-5">
+            <h2 class="text-base font-semibold">小贴士</h2>
+            <ul class="mt-2 text-xs text-slate-600 leading-relaxed list-disc pl-4">
+              <li>安全：绿色；警告：黄色；违规：红色。</li>
+              <li>多语种内容也会参与风险判断。</li>
+              <li>想让语气更安全：避免辱骂、拉踩、引战词。</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- Floating AI mascot -->
+    <button id="btnAi" class="fixed right-5 bottom-5 h-14 w-14 rounded-full shadow-lg border border-white/70 bg-gradient-to-br from-pink-200 via-fuchsia-100 to-sky-200 hover:brightness-[1.02] active:translate-y-px">
+      <span class="sr-only">AI 助手</span>
+      <div class="h-full w-full flex items-center justify-center text-xl">🤖</div>
+    </button>
+    <div id="aiPanel" class="fixed right-5 bottom-24 w-[min(92vw,360px)] hidden">
+      <div class="card rounded-3xl shadow-lg p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <div class="text-sm font-semibold">AI 助手小提示</div>
+            <div class="text-xs text-slate-600 mt-1">让社区更温柔一点点～</div>
+          </div>
+          <button id="btnAiClose" class="px-2 py-1 text-xs rounded-xl border bg-white/70 border-slate-200/70 hover:bg-white">关闭</button>
+        </div>
+        <div class="mt-3 space-y-2 text-sm">
+          <div class="rounded-2xl border bg-white/70 border-slate-200/70 p-3">
+            <div class="font-medium">自动检测风险</div>
+            <div class="text-xs text-slate-600 mt-1">你发布的内容会即时标注：安全/警告/违规。</div>
+          </div>
+          <div class="rounded-2xl border bg-white/70 border-slate-200/70 p-3">
+            <div class="font-medium">多语种翻译提示</div>
+            <div class="text-xs text-slate-600 mt-1">遇到外语/混合语句，建议先翻译再判断语气强度。</div>
+          </div>
+          <div class="rounded-2xl border bg-white/70 border-slate-200/70 p-3">
+            <div class="font-medium">发言安全建议</div>
+            <div class="text-xs text-slate-600 mt-1">把“你不行”改成“我更喜欢另一种风格”，更不易引战。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 50 seed comments provided by user
+      const SEED = [
+        {"nickname":"星星爱好者","content":"宝宝今天舞台也太好看了吧！","risk":"safe"},
+        {"nickname":"小桃汽水","content":"真的好努力一小孩，未来可期","risk":"safe"},
+        {"nickname":"月亮邮递员","content":"这首歌循环一晚上了，太治愈","risk":"safe"},
+        {"nickname":"奶盖爱好者","content":"颜值真的很能打，生图也抗打","risk":"safe"},
+        {"nickname":"草莓泡芙","content":"每天都要来看一遍，心情都变好了","risk":"safe"},
+        {"nickname":"云朵有点甜","content":"业务能力真的强，唱跳都在线","risk":"safe"},
+        {"nickname":"橘子味夏天","content":"性格好好啊，温柔又有礼貌","risk":"safe"},
+        {"nickname":"芝士小方","content":"每次出现都让人眼前一亮，太绝了","risk":"safe"},
+        {"nickname":"葡萄冻冻","content":"真的好喜欢这种干净清爽的气质","risk":"safe"},
+        {"nickname":"芒果西米露","content":"努力总会被看见的，加油","risk":"safe"},
+
+        {"nickname":"吃瓜路人","content":"也就那样吧，没什么特别的","risk":"neutral"},
+        {"nickname":"路人甲","content":"感觉表现力一般，不算突出","risk":"neutral"},
+        {"nickname":"路过一下","content":"歌还行，人没什么记忆点","risk":"neutral"},
+        {"nickname":"随便看看","content":"舞台中规中矩，不算惊艳","risk":"neutral"},
+        {"nickname":"娱乐观众","content":"也就粉丝吹得厉害而已","risk":"neutral"},
+
+        {"nickname":"踩踩怪","content":"这也能吹？隔壁某某比他强多了","risk":"warning"},
+        {"nickname":"引战选手","content":"就这水平？还不如回家种地","risk":"warning"},
+        {"nickname":"碰瓷专业户","content":"别来蹭热度了，真的很烦","risk":"warning"},
+        {"nickname":"拉踩大王","content":"颜值被吊打，实力也一般","risk":"warning"},
+        {"nickname":"阴阳怪气","content":"也就粉丝闭眼夸，路人看着尴尬","risk":"warning"},
+
+        {"nickname":"恶意用户1","content":"长得真丑，还好意思出来","risk":"toxic"},
+        {"nickname":"恶意用户2","content":"赶紧滚出娱乐圈吧","risk":"toxic"},
+        {"nickname":"恶意用户3","content":"废物一个，什么都不会","risk":"toxic"},
+        {"nickname":"恶意用户4","content":"看着就恶心，别出来丢人","risk":"toxic"},
+        {"nickname":"恶意用户5","content":"这辈子也就这样了，没前途","risk":"toxic"},
+
+        {"nickname":"海外粉1","content":"So cute! I love your performance so much!","risk":"safe"},
+        {"nickname":"海外粉2","content":"You are so talented, keep going!","risk":"safe"},
+        {"nickname":"海外黑粉1","content":"You are terrible, go away","risk":"toxic"},
+        {"nickname":"海外黑粉2","content":"Your performance is so bad","risk":"toxic"},
+
+        {"nickname":"韩国粉丝","content":"정말 잘생겼어요! 최고에요!","risk":"safe"},
+        {"nickname":"韩国路人","content":"실력이 괜찮은데 인기는 없네","risk":"neutral"},
+        {"nickname":"韩国黑粉","content":"그냥 그래요 별로임","risk":"warning"},
+        {"nickname":"韩国恶评","content":"보기 싫다 꺼져","risk":"toxic"},
+
+        {"nickname":"日本粉丝","content":"可愛いです！いつも頑張ってください！","risk":"safe"},
+        {"nickname":"日本路人","content":"まあまあですね","risk":"neutral"},
+        {"nickname":"日本黑粉","content":"全然上手くない","risk":"warning"},
+        {"nickname":"日本恶评","content":"うざい、消えろ","risk":"toxic"},
+
+        {"nickname":"多语种混合1","content":"宝宝真棒！👍 love you forever!","risk":"safe"},
+        {"nickname":"多语种混合2","content":"이쁘다 😍 舞台真的绝了","risk":"safe"},
+        {"nickname":"多语种混合3","content":"早く消えなさい、本当に嫌い","risk":"toxic"},
+        {"nickname":"多语种混合4","content":"别蹭了，真的很烦 👎","risk":"warning"},
+
+        {"nickname":"表情党1","content":"🥺🥺🥺 太可爱了吧！","risk":"safe"},
+        {"nickname":"表情党2","content":"✨✨✨ 舞台闪闪发光","risk":"safe"},
+        {"nickname":"表情党3","content":"👎👎👎 就这？","risk":"warning"},
+        {"nickname":"表情党4","content":"🤢🤢 看着就不舒服","risk":"toxic"},
+
+        {"nickname":"饭圈缩写1","content":"zyl真的好努力，yyds！","risk":"safe"},
+        {"nickname":"饭圈缩写2","content":"别拉踩了，专注自家吧","risk":"warning"},
+        {"nickname":"饭圈缩写3","content":"别碰瓷了，真的很无语","risk":"warning"},
+        {"nickname":"路人围观","content":"氛围还不错，就是有点吵","risk":"neutral"},
+        {"nickname":"佛系粉丝","content":"安安静静喜欢就好，不吵不闹","risk":"safe"}
+      ];
+
+      // runtime state: seed + server posts
+      let localItems = SEED.map((x, idx) => ({
+        local_id: "seed-" + (idx + 1),
+        nickname: x.nickname,
+        content: x.content,
+        risk: x.risk,
+        source: "seed",
+        created_at: new Date(Date.now() - (SEED.length - idx) * 60000).toISOString(),
+      }));
+      let serverItems = []; // {id, user_id, content, moderation, ...}
+
+      // perf: caches & request de-dupe
+      const inflight = new Map(); // key -> Promise
+      const cache = new Map(); // key -> {t, v}
+      const translationCache = new Map(); // key `${lid}:${lang}` -> text
+      const repliesCache = new Map(); // key lid -> array
+      const revealState = new Set(); // local_id revealed
+
+      function debounce(fn, waitMs) {
+        let t = null;
+        return (...args) => {
+          if (t) clearTimeout(t);
+          t = setTimeout(() => fn(...args), waitMs);
+        };
+      }
+
+      async function fetchJsonDedup(url, opts = {}, ttlMs = 0) {
+        const key = (opts.method || "GET") + " " + url + " " + (opts.body ? String(opts.body).slice(0, 80) : "");
+        const now = Date.now();
+        if (ttlMs > 0) {
+          const hit = cache.get(key);
+          if (hit && now - hit.t < ttlMs) return hit.v;
+        }
+        if (inflight.has(key)) return inflight.get(key);
+        const p = (async () => {
+          const r = await fetch(url, opts);
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok) throw new Error(j.detail || r.status);
+          if (ttlMs > 0) cache.set(key, { t: Date.now(), v: j });
+          return j;
+        })().finally(() => inflight.delete(key));
+        inflight.set(key, p);
+        return p;
+      }
+
+      // local analytics (single-browser)
+      const ANALYTICS_KEY = "pzyy.analytics.v1";
+      function loadAnalytics() {
+        try {
+          return JSON.parse(localStorage.getItem(ANALYTICS_KEY) || "{}") || {};
+        } catch {
+          return {};
+        }
+      }
+      function saveAnalytics(a) {
+        try {
+          localStorage.setItem(ANALYTICS_KEY, JSON.stringify(a));
+        } catch {}
+      }
+      function track(type, payload = {}) {
+        const a = loadAnalytics();
+        a.events = Array.isArray(a.events) ? a.events : [];
+        a.events.push({ t: Date.now(), type, ...payload });
+        // cap
+        if (a.events.length > 2000) a.events = a.events.slice(a.events.length - 2000);
+        saveAnalytics(a);
+      }
+
+      function esc(s) {
+        return String(s ?? "").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+      }
+
+      function hasNonZhLetters(text) {
+        const s = String(text || "");
+        return /[A-Za-z\u3040-\u30ff\uac00-\ud7af]/.test(s);
+      }
+
+      function classifyType(content) {
+        const s = String(content || "");
+        const lower = s.toLowerCase();
+        const insult = /(丑|滚|废物|恶心|消えろ|うざい|go away|terrible|bad)/.test(s) || /(terrible|go away|bad)/.test(lower);
+        const compare = /(隔壁|比他强|吊打|拉踩|某某比|更强多了)/.test(s);
+        const war = /(就这水平|别来蹭|碰瓷|引战|闭眼夸|很烦|尴尬)/.test(s);
+        const multi = hasNonZhLetters(s);
+        return { insult, compare, war, multi };
+      }
+
+      function riskToBadge(risk) {
+        if (risk === "toxic") return { text: "违规", cls: "bg-rose-50 text-rose-900 border-rose-200/70", dot: "bg-rose-500" };
+        if (risk === "warning") return { text: "警告", cls: "bg-amber-50 text-amber-900 border-amber-200/70", dot: "bg-amber-500" };
+        return { text: "安全", cls: "bg-emerald-50 text-emerald-900 border-emerald-200/70", dot: "bg-emerald-500" };
+      }
+
+      function obfuscateWarning(text) {
+        const s = String(text || "");
+        // 简单“打码”策略：保留开头 2-6 个字符，其余用 ***
+        // 同时针对常见引战/拉踩/辱骂词做更强打码
+        const strong = /(拉踩|吊打|隔壁|碰瓷|引战|滚|丑|废物|恶心|消えろ|うざい|go away|terrible|bad)/gi;
+        const masked = s.replace(strong, "***");
+        if (masked.length <= 6) return "***";
+        const head = masked.slice(0, Math.min(6, Math.max(2, Math.floor(masked.length * 0.25))));
+        return head + " ***";
+      }
+
+      function moderationToRisk(m) {
+        if (!m) return "neutral";
+        const sev = m.severity;
+        const act = m.action;
+        if (sev === "HIGH" || ["BAN", "DELETE"].includes(act)) return "toxic";
+        if (sev === "MED" || ["WARN", "MUTE", "HIDE", "REVIEW"].includes(act)) return "warning";
+        return "safe";
+      }
+
+      function updateKpis(allViewItems) {
+        const total = allViewItems.length;
+        let safe = 0, warn = 0, toxic = 0;
+        let dInsult = 0, dCompare = 0, dWar = 0, dMulti = 0;
+        for (const it of allViewItems) {
+          const r = it.risk;
+          if (r === "safe") safe++;
+          else if (r === "warning") warn++;
+          else if (r === "toxic") toxic++;
+          const t = classifyType(it.content);
+          if (t.insult && (r === "warning" || r === "toxic")) dInsult++;
+          if (t.compare && (r === "warning" || r === "toxic")) dCompare++;
+          if (t.war && (r === "warning" || r === "toxic")) dWar++;
+          if (t.multi) dMulti++;
+        }
+        document.getElementById("kpiTotal").textContent = String(total);
+        document.getElementById("kpiSafe").textContent = String(safe);
+        document.getElementById("kpiWarn").textContent = String(warn);
+        document.getElementById("kpiToxic").textContent = String(toxic);
+        document.getElementById("dInsult").textContent = String(dInsult);
+        document.getElementById("dCompare").textContent = String(dCompare);
+        document.getElementById("dWar").textContent = String(dWar);
+        document.getElementById("dMulti").textContent = String(dMulti);
+
+        // behavior metrics from local analytics
+        const a = loadAnalytics();
+        const ev = Array.isArray(a.events) ? a.events : [];
+        const now = Date.now();
+        const dayKey = (t) => new Date(t).toISOString().slice(0, 10);
+        const last7 = ev.filter((e) => now - (e.t || 0) < 7 * 24 * 3600 * 1000);
+
+        const viewDays = new Set(last7.filter((e) => e.type === "page_view").map((e) => dayKey(e.t)));
+        const returnDays = new Set(last7.filter((e) => e.type === "page_view").map((e) => dayKey(e.t)));
+        // returning day = day with >=2 page views (simple)
+        const dayCounts = {};
+        for (const e of last7) if (e.type === "page_view") dayCounts[dayKey(e.t)] = (dayCounts[dayKey(e.t)] || 0) + 1;
+        const returning = Object.entries(dayCounts).filter(([, c]) => c >= 2).length;
+        const visited = viewDays.size || 0;
+        const retention = visited ? Math.round((returning / visited) * 100) : 0;
+        document.getElementById("kpiRetention").textContent = String(retention);
+
+        const impressions = last7.filter((e) => e.type === "impression").length;
+        const clicks = last7.filter((e) => e.type === "click").length;
+        const ctr = impressions ? Math.round((clicks / impressions) * 100) : 0;
+        document.getElementById("kpiCtr").textContent = String(ctr);
+
+        const seen = new Set(last7.filter((e) => e.type === "impression").map((e) => e.id)).size;
+        const browse = total ? Math.round((seen / total) * 100) : 0;
+        document.getElementById("kpiBrowse").textContent = String(browse);
+
+        // peak by hour
+        const hours = Array.from({ length: 24 }, () => 0);
+        for (const e of last7) {
+          if (e.type !== "page_view") continue;
+          const h = new Date(e.t).getHours();
+          hours[h] = (hours[h] || 0) + 1;
+        }
+        const maxH = Math.max(1, ...hours);
+        const peak = document.getElementById("kpiPeak");
+        peak.innerHTML = "";
+        for (let h = 0; h < 24; h++) {
+          const bar = document.createElement("div");
+          bar.className = "rounded-md border border-white/70 bg-white/60";
+          bar.style.height = Math.max(6, Math.round((hours[h] / maxH) * 56)) + "px";
+          bar.title = `${h}:00 · ${hours[h]} 次`;
+          peak.appendChild(bar);
+        }
+      }
+
+      const scheduleRefresh = debounce(() => refreshFromServer({ force: true }), 800);
+
+      function render() {
+        const items = [
+          ...serverItems.map((c) => ({
+            local_id: "srv-" + c.id,
+            nickname: "游客#" + c.user_id,
+            content: c.content,
+            risk: moderationToRisk(c.moderation),
+            source: "server",
+            created_at: c.created_at,
+            meta: c,
+          })),
+          ...localItems,
+        ].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+
+        updateKpis(items);
+
+        const host = document.getElementById("feed");
+        // perf: one-shot HTML replace (no per-item listeners)
+        let html = "";
+        for (const it of items) {
+          const badge = riskToBadge(it.risk);
+          const likeCount = Number(it.like_count ?? 0);
+          const replyCount = Number(it.reply_count ?? 0);
+          const showContent =
+            it.risk === "safe" ? esc(it.content) : it.risk === "warning" ? esc(obfuscateWarning(it.content)) : "";
+          const isRevealed = revealState.has(it.local_id);
+          html += `
+          <div class="rounded-3xl border border-slate-200/60 bg-white/75 shadow-sm p-4" data-id="${it.local_id}">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex h-2 w-2 rounded-full ${badge.dot}"></span>
+                  <div class="text-sm font-semibold">${esc(it.nickname)}</div>
+                  <span class="text-[11px] px-2 py-1 rounded-full border ${badge.cls}">${badge.text}</span>
+                  ${hasNonZhLetters(it.content) ? `<span class="text-[11px] px-2 py-1 rounded-full border bg-white/70 border-slate-200/70 text-slate-700">多语种</span>` : ""}
+                </div>
+                ${
+                  it.risk === "toxic"
+                    ? `<div class="mt-2 rounded-2xl border border-rose-200/60 bg-rose-50/40 p-3">
+                        <div class="text-sm font-medium text-rose-900">已触发违规内容遮挡（开盲盒查看）</div>
+                        <div class="text-xs text-rose-900/70 mt-1">为避免引战/攻击性扩散，默认隐藏。你可以选择点击查看原文。</div>
+                        <button data-act="reveal" class="mt-3 px-3 py-2 rounded-xl text-xs border bg-white/70 border-rose-200/60 hover:bg-white">开盲盒查看</button>
+                        <div class="${isRevealed ? "" : "hidden"} mt-3 text-sm whitespace-pre-wrap break-words leading-relaxed">${esc(it.content)}</div>
+                      </div>`
+                    : `<div class="mt-2 text-sm whitespace-pre-wrap break-words leading-relaxed">${showContent}</div>`
+                }
+                ${
+                  it.risk === "warning"
+                    ? `<div class="mt-2 text-xs text-amber-900/80">已自动模糊处理（Agent 决策：降低刺激性传播）。</div>`
+                    : it.risk === "safe"
+                    ? `<div class="mt-2 text-xs text-emerald-900/70">Agent 决策：安全放行。</div>`
+                    : `<div class="mt-2 text-xs text-rose-900/70">Agent 决策：违规遮挡。</div>`
+                }
+              </div>
+              <div class="shrink-0 text-[11px] text-slate-500">${new Date(it.created_at).toLocaleString()}</div>
+            </div>
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+              <button data-act="like" class="px-3 py-2 rounded-xl text-xs border bg-white/70 border-slate-200/60 hover:bg-white">👍 赞 <span data-like>${likeCount}</span></button>
+              <button data-act="reply" class="px-3 py-2 rounded-xl text-xs border bg-white/70 border-slate-200/60 hover:bg-white">💬 回复 <span data-rc>${replyCount}</span></button>
+              <button data-act="translate" class="px-3 py-2 rounded-xl text-xs border bg-white/70 border-slate-200/60 hover:bg-white">🌍 翻译</button>
+              <select data-lang class="text-xs rounded-xl border border-slate-200/70 bg-white/70 px-2 py-2">
+                <option value="zh">中文</option>
+                <option value="en">English</option>
+                <option value="ja">日本語</option>
+                <option value="ko">한국어</option>
+                <option value="th">ไทย</option>
+              </select>
+              <span data-tr class="text-xs text-slate-600"></span>
+            </div>
+            <div class="hidden mt-3 rounded-2xl border border-slate-200/60 bg-white/60 p-3" data-replybox>
+              <textarea rows="2" class="w-full rounded-2xl border border-slate-200/70 bg-white/70 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-pink-200" placeholder="写一条回复…" data-replytxt></textarea>
+              <div class="mt-2 flex items-center gap-2">
+                <button data-act="doreply" class="px-3 py-2 rounded-xl text-xs border bg-white/70 border-slate-200/60 hover:bg-white">发送回复</button>
+                <button data-act="loadreplies" class="px-3 py-2 rounded-xl text-xs border bg-white/70 border-slate-200/60 hover:bg-white">查看回复</button>
+                <span data-replymsg class="text-xs text-slate-600"></span>
+              </div>
+              <div class="mt-3 hidden space-y-2" data-replies></div>
+            </div>
+          </div>`;
+        }
+        host.innerHTML = html;
+      }
+
+      // perf: event delegation (single handler)
+      document.getElementById("feed").addEventListener("click", async (e) => {
+        const btn = e.target.closest("button[data-act]");
+        if (!btn) return;
+        const card = e.target.closest("[data-id]");
+        if (!card) return;
+        const lid = card.getAttribute("data-id");
+        const act = btn.getAttribute("data-act");
+        track("click", { act, id: lid });
+
+        const server = serverItems.find((x) => "srv-" + x.id === lid);
+        const local = localItems.find((x) => x.local_id === lid);
+        const likeEl = card.querySelector("[data-like]");
+        const rcEl = card.querySelector("[data-rc]");
+        const trEl = card.querySelector("[data-tr]");
+        const replyBox = card.querySelector("[data-replybox]");
+        const replyTxt = card.querySelector("[data-replytxt]");
+        const replyMsg = card.querySelector("[data-replymsg]");
+        const repliesHost = card.querySelector("[data-replies]");
+        const langSel = card.querySelector("select[data-lang]");
+
+        if (act === "reveal") {
+          revealState.has(lid) ? revealState.delete(lid) : revealState.add(lid);
+          render();
+          return;
+        }
+
+        if (act === "like") {
+          if (server) {
+            // optimistic update
+            server.like_count = Number(server.like_count || 0) + 1;
+            if (likeEl) likeEl.textContent = String(server.like_count);
+            scheduleRefresh();
+            try {
+              await fetchJsonDedup(`/v1/comments/${server.id}/like`, { method: "POST" }, 0);
+            } catch {}
+            return;
+          }
+          if (local) {
+            local.like_count = Number(local.like_count || 0) + 1;
+            if (likeEl) likeEl.textContent = String(local.like_count);
+          }
+          return;
+        }
+
+        if (act === "reply") {
+          if (replyBox) replyBox.classList.toggle("hidden");
+          return;
+        }
+
+        if (act === "doreply") {
+          if (replyMsg) replyMsg.textContent = "";
+          const content = (replyTxt && replyTxt.value ? replyTxt.value.trim() : "");
+          if (!content) return (replyMsg.textContent = "回复不能为空。");
+          const nickname = (document.getElementById("nickname").value.trim() || "游客").slice(0, 64);
+          if (server) {
+            // optimistic reply count
+            server.reply_count = Number(server.reply_count || 0) + 1;
+            if (rcEl) rcEl.textContent = String(server.reply_count);
+            scheduleRefresh();
+            try {
+              await fetchJsonDedup(
+                "/v1/comments",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ username: nickname, content, parent_comment_id: Number(server.id) }),
+                },
+                0
+              );
+              if (replyTxt) replyTxt.value = "";
+              if (replyMsg) replyMsg.textContent = "已发送～";
+              // invalidate cached replies
+              repliesCache.delete(lid);
+            } catch {
+              if (replyMsg) replyMsg.textContent = "发送失败";
+            }
+            return;
+          }
+          if (local) {
+            local.reply_count = Number(local.reply_count || 0) + 1;
+            if (!local._replies) local._replies = [];
+            local._replies.push({ nickname, content, created_at: new Date().toISOString() });
+            if (rcEl) rcEl.textContent = String(local.reply_count);
+            if (replyTxt) replyTxt.value = "";
+            if (replyMsg) replyMsg.textContent = "已发送～";
+          }
+          return;
+        }
+
+        if (act === "loadreplies") {
+          if (!repliesHost) return;
+          repliesHost.classList.remove("hidden");
+          repliesHost.textContent = "加载中…";
+          if (repliesCache.has(lid)) {
+            const cached = repliesCache.get(lid);
+            repliesHost.innerHTML = cached.length ? "" : `<div class="text-xs text-slate-500">暂无回复</div>`;
+            for (const x of cached) {
+              const div = document.createElement("div");
+              div.className = "rounded-2xl border border-slate-200/60 bg-white/70 p-3";
+              div.innerHTML = `<div class="text-xs text-slate-500">${esc(x.nickname || ("游客#" + x.user_id))}</div>
+                <div class="mt-1 text-sm whitespace-pre-wrap break-words leading-relaxed">${esc(x.content || "")}</div>`;
+              repliesHost.appendChild(div);
+            }
+            return;
+          }
+          try {
+            let items = [];
+            if (server) {
+              const j = await fetchJsonDedup(`/v1/comments/${server.id}/replies?limit=50`, {}, 3000);
+              items = j.items || [];
+              repliesCache.set(lid, items);
+            } else if (local) {
+              items = local._replies || [];
+              repliesCache.set(lid, items);
+            }
+            repliesHost.innerHTML = items.length ? "" : `<div class="text-xs text-slate-500">暂无回复</div>`;
+            for (const x of items) {
+              const div = document.createElement("div");
+              div.className = "rounded-2xl border border-slate-200/60 bg-white/70 p-3";
+              div.innerHTML = `<div class="text-xs text-slate-500">${esc(x.nickname || ("游客#" + x.user_id))}</div>
+                <div class="mt-1 text-sm whitespace-pre-wrap break-words leading-relaxed">${esc(x.content || "")}</div>`;
+              repliesHost.appendChild(div);
+            }
+          } catch {
+            repliesHost.innerHTML = `<div class="text-xs text-rose-700">加载失败</div>`;
+          }
+          return;
+        }
+
+        if (act === "translate") {
+          const target_lang = langSel ? langSel.value : "zh";
+          const ck = lid + ":" + target_lang;
+          if (translationCache.has(ck)) {
+            if (trEl) trEl.textContent = translationCache.get(ck);
+            return;
+          }
+          if (trEl) trEl.textContent = "翻译中…";
+          try {
+            let translated = "";
+            if (server) {
+              const j = await fetchJsonDedup(
+                `/v1/comments/${server.id}/translate`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ target_lang }),
+                },
+                0
+              );
+              translated = (j.translated_text || "").trim();
+            } else {
+              const text = local ? local.content : "";
+              const j = await fetchJsonDedup(
+                `/v1/translate`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ text, target_lang }),
+                },
+                0
+              );
+              translated = (j.translated_text || "").trim();
+            }
+            translationCache.set(ck, translated || "（空）");
+            if (trEl) trEl.textContent = translationCache.get(ck);
+          } catch {
+            if (trEl) trEl.textContent = "翻译失败";
+          }
+          return;
+        }
+      });
+
+      // perf: record impressions only once per id
+      const seenOnce = new Set();
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const ent of entries) {
+            if (!ent.isIntersecting) continue;
+            const el = ent.target;
+            const id = el.getAttribute("data-id");
+            if (!id || seenOnce.has(id)) continue;
+            seenOnce.add(id);
+            track("impression", { id });
+          }
+        },
+        { rootMargin: "80px 0px", threshold: 0.15 }
+      );
+
+      async function refreshFromServer({ force = false } = {}) {
+        try {
+          const j = await fetchJsonDedup("/v1/comments?limit=50&include_replies=false", {}, force ? 0 : 3000);
+          serverItems = (j.items || []).filter((x) => x && x.parent_comment_id == null);
+        } catch (e) {
+          // ignore network issues; seed still renders
+        }
+        render();
+        // observe cards after render
+        document.querySelectorAll("#feed [data-id]").forEach((el) => io.observe(el));
+      }
+
+      async function postToServer() {
+        const msg = document.getElementById("postMsg");
+        msg.textContent = "";
+        const nickname = (document.getElementById("nickname").value.trim() || "游客").slice(0, 64);
+        const content = document.getElementById("content").value.trim();
+        if (!content) return (msg.textContent = "内容不能为空。");
+        try {
+          const j = await fetchJsonDedup(
+            "/v1/comments",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username: nickname, content }),
+            },
+            0
+          );
+          document.getElementById("content").value = "";
+          msg.textContent = "发布成功～已自动检测风险并刷新。";
+          // optimistic insert
+          if (j && j.comment) serverItems = [j.comment, ...serverItems];
+          render();
+          scheduleRefresh();
+        } catch (e) {
+          msg.textContent = "发布失败（后端不可用时你仍能看到模拟社区内容）";
+        }
+      }
+
+      const refreshDebounced = debounce(() => refreshFromServer({ force: true }), 400);
+      document.getElementById("btnRefresh").addEventListener("click", () => refreshDebounced());
+      document.getElementById("btnPost").addEventListener("click", () => postToServer());
+
+      // floating AI mascot
+      const btnAi = document.getElementById("btnAi");
+      const aiPanel = document.getElementById("aiPanel");
+      const btnAiClose = document.getElementById("btnAiClose");
+      btnAi.addEventListener("click", () => aiPanel.classList.toggle("hidden"));
+      btnAiClose.addEventListener("click", () => aiPanel.classList.add("hidden"));
+      btnAi.addEventListener("click", () => track("click", { act: "ai_open", id: "ai" }));
+
+      // Make AI assistant useful: analyze current draft and offer safer rewrite
+      const adviceHostId = "aiAdvice";
+      if (!document.getElementById(adviceHostId)) {
+        const box = aiPanel.querySelector(".card");
+        const extra = document.createElement("div");
+        extra.id = adviceHostId;
+        extra.className = "mt-3 rounded-2xl border bg-white/70 border-slate-200/70 p-3";
+        extra.innerHTML = `
+          <div class="text-sm font-medium">一键让 Agent 给建议</div>
+          <div class="mt-2 flex flex-wrap gap-2">
+            <button id="btnCheckDraft" class="px-3 py-2 rounded-xl text-xs border bg-white/70 border-slate-200/60 hover:bg-white">检查当前输入</button>
+            <button id="btnApplyRewrite" class="px-3 py-2 rounded-xl text-xs border bg-white/70 border-slate-200/60 hover:bg-white">把建议改写填入输入框</button>
+          </div>
+          <div id="adviceText" class="mt-2 text-xs text-slate-700"></div>
+        `;
+        box.appendChild(extra);
+      }
+
+      let lastSuggestion = "";
+      async function checkDraft() {
+        const text = (document.getElementById("content").value || "").trim();
+        const out = document.getElementById("adviceText");
+        if (!text) return (out.textContent = "先在右侧输入框写点内容～");
+        out.textContent = "分析中…";
+        try {
+          const r = await fetch("/v1/agent/advice", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text }),
+          });
+          const j = await r.json();
+          if (!r.ok) throw new Error(j.detail || r.status);
+          lastSuggestion = j.suggestion || "";
+          out.innerHTML = `
+            <div>风险：<b>${esc(j.risk_level)}</b> · 动作：<b>${esc(j.action)}</b> · 分数：<b>${esc(j.risk_score)}</b>（${esc(j.severity)}）</div>
+            <div class="mt-1">证据：${esc(j.evidence || "(空)")}</div>
+            <div class="mt-1">理由：${esc(j.rationale || "(空)")}</div>
+            <div class="mt-1">建议：<b>${esc(j.suggestion || "")}</b></div>
+          `;
+        } catch (e) {
+          out.textContent = "分析失败（后端不可用时会失败）";
+        }
+      }
+      document.getElementById("btnCheckDraft").addEventListener("click", () => checkDraft());
+      document.getElementById("btnApplyRewrite").addEventListener("click", () => {
+        if (!lastSuggestion) return;
+        // 仅做“建议展示”，不强行覆盖原文：把建议追加到输入框末尾
+        const ta = document.getElementById("content");
+        ta.value = (ta.value || "").trim() + "\n\n" + lastSuggestion;
+        ta.focus();
+      });
+
+      // initial render
+      track("page_view");
+      render();
+      refreshFromServer();
+    </script>
+  </body>
+</html>

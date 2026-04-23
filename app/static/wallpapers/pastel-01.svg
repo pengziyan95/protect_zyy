@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff1fb"/>
+      <stop offset="35%" stop-color="#fff7d6"/>
+      <stop offset="70%" stop-color="#e8f3ff"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+    <radialGradient id="b1" cx="20%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffd6ef" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#ffd6ef" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b2" cx="80%" cy="30%" r="55%">
+      <stop offset="0%" stop-color="#bfe6ff" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#bfe6ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b3" cx="50%" cy="90%" r="60%">
+      <stop offset="0%" stop-color="#fff2b0" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#fff2b0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g)"/>
+  <rect width="1600" height="900" fill="url(#b1)"/>
+  <rect width="1600" height="900" fill="url(#b2)"/>
+  <rect width="1600" height="900" fill="url(#b3)"/>
+  <g opacity="0.35" fill="none" stroke="#ffffff" stroke-width="2">
+    <path d="M-40 200 C 220 40, 420 40, 700 200 S 1200 360, 1700 120"/>
+    <path d="M-40 360 C 260 220, 520 200, 820 360 S 1240 520, 1700 300"/>
+  </g>
+</svg>
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff1fb"/>
+      <stop offset="35%" stop-color="#fff7d6"/>
+      <stop offset="70%" stop-color="#e8f3ff"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+    <radialGradient id="b1" cx="20%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffd6ef" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#ffd6ef" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b2" cx="80%" cy="30%" r="55%">
+      <stop offset="0%" stop-color="#bfe6ff" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#bfe6ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b3" cx="50%" cy="90%" r="60%">
+      <stop offset="0%" stop-color="#fff2b0" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#fff2b0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g)"/>
+  <rect width="1600" height="900" fill="url(#b1)"/>
+  <rect width="1600" height="900" fill="url(#b2)"/>
+  <rect width="1600" height="900" fill="url(#b3)"/>
+  <g opacity="0.35" fill="none" stroke="#ffffff" stroke-width="2">
+    <path d="M-40 200 C 220 40, 420 40, 700 200 S 1200 360, 1700 120"/>
+    <path d="M-40 360 C 260 220, 520 200, 820 360 S 1240 520, 1700 300"/>
+  </g>
+</svg>
