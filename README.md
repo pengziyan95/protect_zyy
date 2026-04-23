@@ -1,10 +1,10 @@
 ## protect_zyy
 多语种（中/日/韩/英/泰）饭圈社区风控 **Agent Demo**：将“风控决策”映射为前端可见动作（安全放行/警告打码/违规盲盒遮挡），并提供翻译、点赞、回复、简易数据看板。
 
-### 运行要求
+运行要求
 - Python 3.11+
 
-### 面试官/阅览者快速验收（推荐）
+
 启动后直接打开：
 - 页面体验：`http://127.0.0.1:8001/app`
 - API 文档：`http://127.0.0.1:8001/docs`
@@ -15,7 +15,7 @@
 - 每条评论：点赞 / 回复 / 翻译
 - 右下角 AI 助手：可对“当前输入”给出风险判断与发言建议
 
-### 火山引擎（阶段 4：语义风控）
+### 火山引擎（语义风控）
 本项目支持接入火山引擎（Ark）让风控不只靠“死词典”，而是能识别变体、隐晦表达和多语种语义。
 
 1. 复制配置文件并填写你的信息：
@@ -34,15 +34,9 @@ copy .env.example .env
 
 如果不配置 `.env`，系统会自动降级为“规则版风控”（仍可跑通三振/复核/改判闭环）。
 
-### 安全与成本控制（很重要）
-- **不要提交 `.env`**：仓库已在 `.gitignore` 中忽略 `.env`。请只提交 `.env.example`。
-- **密钥只放服务器环境变量/Secrets**：不要写死在代码或前端页面里。
-- **建议默认关闭/降级 LLM**：公网 Demo 推荐 `VOLC_LLM_MODE=off`（规则版风控依然可演示闭环），现场讲解再切 `smart`。
-- **接口可能产生费用**：`/v1/translate` 与 `/v1/agent/advice`（如果启用 LLM）会调用外部 API；建议加限流/缓存后再做公网开放。
 
-### 指标看板 / API（阶段 5/6 起步）
-用于验证“接好火山后，是否真的在走语义判定”，并观察 LLM 调用是否稳定：
 
+### 指标看板 / API
 - 本地看板页面：`http://127.0.0.1:8001/ui`
 - 面向用户的清新版界面：`http://127.0.0.1:8001/app`（支持自定义背景）
 - 指标 JSON：`http://127.0.0.1:8001/v1/metrics/summary?days=7`
@@ -77,11 +71,8 @@ pip install -r requirements.txt
 - API 文档：`http://127.0.0.1:8001/docs`
 - 健康检查：`http://127.0.0.1:8001/healthz`
 
-### 上传到 GitHub（不泄露 Key）
-1. **确认本地没有 `.env` 被提交**：仓库已忽略 `.env`，只保留 `.env.example`
-2. 初始化并推送（示例，Windows PowerShell）：
+### 上传GitHub
 
-```bash
 git init
 git add .
 git commit -m "init: multilingual moderation agent demo"
@@ -90,9 +81,8 @@ git remote add origin <your_repo_git_url>
 git push -u origin main
 ```
 
-> 注意：如果你是“直接上传压缩包”到 GitHub，而不是用 git 推送，压缩包可能会包含 `.venv/` 等大文件；建议用 git 推送（`.gitignore` 会自动排除）。
 
-### 快速演示（最小闭环）
+### 演示
 1. 创建/获取用户（自动创建）并发表评论（会触发风控判定）
 2. 如果同一用户累计违规达到 3 次，会自动封禁（ban）
 
@@ -109,6 +99,5 @@ git push -u origin main
 如果你想清空演示数据（避免旧评论干扰），用：
 - `POST /v1/admin/demo/reset`
 
-### 项目推进手册（防断上下文）
-完整“必做事项/准备/执行顺序/卡住排查/面试讲法”在 `PROJECT_RUNBOOK.md`。
+
 
