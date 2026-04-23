@@ -71,18 +71,7 @@ pip install -r requirements.txt
 - API 文档：`http://127.0.0.1:8001/docs`
 - 健康检查：`http://127.0.0.1:8001/healthz`
 
-### 上传GitHub
 
-git init
-git add .
-git commit -m "init: multilingual moderation agent demo"
-git branch -M main
-git remote add origin <your_repo_git_url>
-git push -u origin main
-```
-
-
-### 演示
 1. 创建/获取用户（自动创建）并发表评论（会触发风控判定）
 2. 如果同一用户累计违规达到 3 次，会自动封禁（ban）
 
